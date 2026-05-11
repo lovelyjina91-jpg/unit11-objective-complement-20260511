@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Unit 11 · 목적격 보어 랜덤 시험</title>
+<style>
+  :root{
+    --green:#2faa56;
+    --green-dark:#218a41;
+    --yellow:#ffd84d;
+    --bg:#f5faf5;
+    --card:#ffffff;
+    --line:#e1ece2;
+    --text:#1f2a1f;
+    --muted:#6a7a6a;
+    --right:#2faa56;
+    --wrong:#e0524d;
+    --shadow:0 4px 14px rgba(20,60,30,.07);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:"Noto Sans KR","Malgun Gothic",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:820px;margin:0 auto;padding:24px 18px 80px}
+  header{background:linear-gradient(135deg,var(--green) 0%,var(--green-dark) 100%);color:#fff;border-radius:18px;padding:22px 24px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  header::after{content:"";position:absolute;right:-30px;top:-30px;width:140px;height:140px;background:var(--yellow);opacity:.18;border-radius:50%}
+  header h1{margin:0 0 6px;font-size:22px;letter-spacing:-.3px}
+  header .sub{font-size:13.5px;opacity:.92}
+  .toolbar{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:14px;flex-wrap:wrap}
+  .pill{background:rgba(255,255,255,.18);color:#fff;padding:6px 12px;border-radius:999px;font-size:12.5px}
+  .start-card{margin-top:18px;background:var(--card);border-radius:16px;padding:22px;box-shadow:var(--shadow);border:1px solid var(--line)}
+  .start-card h2{margin:0 0 8px;font-size:18px}
+  .start-card p{margin:0 0 14px;color:var(--muted);font-size:14px;line-height:1.55}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  input[type="text"]{flex:1;min-width:160px;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;font-size:14.5px;outline:none;background:#fafdf9;font-family:inherit}
+  input[type="text"]:focus{border-color:var(--green)}
+  button{cursor:pointer;border:none;font-family:inherit;font-weight:600}
+  .btn-primary{background:var(--green);color:#fff;padding:11px 20px;border-radius:10px;font-size:15px;box-shadow:0 2px 0 var(--green-dark);transition:transform .06s ease}
+  .btn-primary:hover{filter:brightness(1.04)}
+  .btn-primary:active{transform:translateY(1px);box-shadow:0 1px 0 var(--green-dark)}
+  .btn-ghost{background:#fff;color:var(--green-dark);border:1.5px solid var(--green);padding:10px 18px;border-radius:10px;font-size:14.5px}
+  .progress-bar{margin:18px 0 12px;height:8px;background:#e6efe6;border-radius:999px;overflow:hidden}
+  .progress-bar > span{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--yellow));border-radius:999px;width:0;transition:width .35s ease}
+  .qcard{background:var(--card);border-radius:16px;padding:20px 22px;margin-top:14px;box-shadow:var(--shadow);border:1px solid var(--line)}
+  .qhead{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .qnum{background:var(--green);color:#fff;width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+  .qstem{font-size:15.5px;line-height:1.6;font-weight:600}
+  .ctx{margin:8px 0 4px;padding:10px 14px;background:#f4f9f3;border-left:3px solid var(--green);border-radius:6px;font-size:15px;line-height:1.6;color:#1f2a1f}
+  .ctx em{font-style:italic;color:#0e7a35;font-weight:600;font-style:normal;background:#fff6c2;padding:1px 4px;border-radius:3px}
+  .options{margin-top:12px;display:grid;gap:8px}
+  .opt{display:flex;align-items:flex-start;gap:10px;padding:11px 13px;border:1.5px solid var(--line);background:#fff;border-radius:10px;font-size:14.5px;cursor:pointer;line-height:1.5;transition:background .12s,border-color .12s}
+  .opt:hover{background:#f4f9f3;border-color:#bcd9bf}
+  .opt input{margin:3px 0 0 0;accent-color:var(--green);transform:scale(1.1);flex-shrink:0}
+  .opt .num{color:var(--green-dark);font-weight:700;margin-right:2px}
+  .opt.correct{background:#e9f7ec;border-color:var(--right)}
+  .opt.wrong{background:#fdecec;border-color:var(--wrong)}
+  .opt.locked{cursor:default}
+  .explain{margin-top:10px;padding:10px 12px;background:#fffbe7;border:1px dashed #e6c84c;border-radius:8px;font-size:13.5px;line-height:1.55;color:#5a4500;display:none}
+  .explain.show{display:block}
+  .footer-actions{display:flex;gap:10px;justify-content:center;margin-top:22px;flex-wrap:wrap}
+  .result{margin-top:18px;background:linear-gradient(135deg,#fff,#f4f9f3);border-radius:18px;padding:26px;box-shadow:var(--shadow);border:1px solid var(--line);text-align:center}
+  .result h2{margin:0 0 6px;color:var(--green-dark);font-size:22px}
+  .score{font-size:46px;font-weight:800;color:var(--green-dark);margin:6px 0}
+  .score small{font-size:18px;color:var(--muted);font-weight:500}
+  .grade{display:inline-block;padding:6px 16px;border-radius:999px;font-weight:700;font-size:14px;color:#fff;background:var(--green);margin-top:6px}
+  .meta{color:var(--muted);font-size:13.5px;margin-top:10px}
+  .hidden{display:none}
+  .review-tag{font-size:12.5px;font-weight:700;padding:3px 8px;border-radius:999px;margin-left:auto}
+  .review-tag.ok{background:#e9f7ec;color:var(--green-dark)}
+  .review-tag.no{background:#fdecec;color:var(--wrong)}
+  @media (max-width:520px){
+    .wrap{padding:14px 12px 60px}
+    header{padding:18px 18px}
+    header h1{font-size:19px}
+    .qcard{padding:16px}
+    .qstem{font-size:14.5px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>Unit 11 · 목적격 보어, 목적어를 설명하는 말</h1>
+    <div class="sub">make / name / call / keep / leave / find + 목적어 + 목적격 보어</div>
+    <div class="toolbar">
+      <span class="pill">📘 4지선다 20문제</span>
+      <span class="pill">🎲 매번 랜덤 출제</span>
+      <span class="pill">⚡ 자동 채점</span>
+    </div>
+  </header>
+
+  <!-- START -->
+  <section id="startCard" class="start-card">
+    <h2>시작 전 안내</h2>
+    <p>
+      교재 <b>Unit 11</b> 「목적격 보어」 단원에서 출제된 객관식 20문제입니다.
+      문제와 보기 순서는 매번 무작위로 섞입니다. 이름을 입력하고 시작 버튼을 누르세요.
+    </p>
+    <div class="row">
+      <input type="text" id="studentName" placeholder="이름을 입력하세요 (예: 김민지)" />
+      <button class="btn-primary" id="btnStart">시험 시작 ▶</button>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quizArea" class="hidden">
+    <div class="progress-bar"><span id="progBar"></span></div>
+    <div id="quizList"></div>
+    <div class="footer-actions">
+      <button class="btn-primary" id="btnSubmit">제출하고 채점하기</button>
+      <button class="btn-ghost" id="btnReset">새 문제로 다시 풀기</button>
+    </div>
+  </section>
+
+  <!-- RESULT -->
+  <section id="resultArea" class="hidden">
+    <div class="result">
+      <h2 id="resultTitle">채점 결과</h2>
+      <div class="score" id="scoreText">0 <small>/ 20</small></div>
+      <div class="grade" id="gradeBadge">—</div>
+      <div class="meta" id="resultMeta"></div>
+      <div class="footer-actions">
+        <button class="btn-primary" id="btnRetake">새 문제로 다시 풀기</button>
+        <button class="btn-ghost" id="btnReview">아래에서 해설 보기 ↓</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ============================================================
+   Unit 11 · 목적격 보어 — 객관식 20문제 데이터
+   각 문제: stem(질문), ctx(예문/지문, 옵션), options(보기 4개),
+            answer(정답 인덱스 0-3), explain(해설)
+   ============================================================ */
+const QUESTIONS = [
+  {
+    stem: "다음 문장에서 목적격 보어로 쓰인 것은?",
+    ctx: "The movie made him <em>a star</em>.",
+    options: ["The movie", "made", "him", "a star"],
+    answer: 3,
+    explain: "make + 목적어(him) + 목적격 보어(a star). 'a star'가 him을 설명하는 명사 보어."
+  },
+  {
+    stem: "빈칸에 들어갈 가장 알맞은 말은?",
+    ctx: "This song always makes me ____.",
+    options: ["sadly", "sadness", "sad", "to sad"],
+    answer: 2,
+    explain: "make + 목적어 + 목적격 보어 자리에는 형용사가 와야 한다. 부사(sadly)·명사(sadness)는 불가."
+  },
+  {
+    stem: "어법상 어색한 문장은?",
+    ctx: null,
+    options: [
+      "I named my dog Henry.",
+      "She made me happy.",
+      "He keeps the room cleanly.",
+      "Please call me Tom."
+    ],
+    answer: 2,
+    explain: "keep + O + OC에서 보어 자리에는 형용사 'clean'이 와야 한다. 부사 cleanly는 올 수 없다."
+  },
+  {
+    stem: "우리말에 맞도록 빈칸에 들어갈 동사로 알맞은 것은?",
+    ctx: "이 코트는 너를 따뜻하게 해 줄 것이다. → This coat will ____ you warm.",
+    options: ["make", "keep", "name", "call"],
+    answer: 1,
+    explain: "‘~한 상태로 유지하다’의 의미는 keep + O + OC. (예: keep you warm)"
+  },
+  {
+    stem: "문장의 구조(형식)가 나머지와 다른 하나는?",
+    ctx: null,
+    options: [
+      "She named her baby Jennifer.",
+      "I call my boyfriend L.",
+      "He bought me a book.",
+      "This coat will keep you warm."
+    ],
+    answer: 2,
+    explain: "①②④는 5형식(주+동+목+목보), ③은 4형식(주+동+간목+직목)."
+  },
+  {
+    stem: "빈칸에 들어갈 가장 적절한 말은?",
+    ctx: "A bunch of flowers will make her ____.",
+    options: ["happy", "happily", "happiness", "to be happy"],
+    answer: 0,
+    explain: "make의 목적격 보어 자리에는 형용사가 온다. → happy."
+  },
+  {
+    stem: "다음 문장의 우리말 해석으로 알맞은 것은?",
+    ctx: "She always keeps her room <em>clean</em>.",
+    options: [
+      "그녀는 항상 방을 청소한다.",
+      "그녀는 항상 방을 깨끗하게 유지한다.",
+      "그녀는 항상 깨끗한 방을 가지고 있다.",
+      "그녀는 항상 방 안에 있다."
+    ],
+    answer: 1,
+    explain: "keep + O + OC: ‘O를 ~한 상태로 유지하다’."
+  },
+  {
+    stem: "다음 우리말을 영어로 옮긴 것 중 가장 알맞은 것은?",
+    ctx: "나는 내 개를 Henry라고 이름 지었다.",
+    options: [
+      "I named Henry my dog.",
+      "I named my dog Henry.",
+      "My dog named Henry.",
+      "I called Henry my dog name."
+    ],
+    answer: 1,
+    explain: "name + 목적어(my dog) + 목적격 보어(Henry) 어순."
+  },
+  {
+    stem: "어법상 옳은 문장은?",
+    ctx: null,
+    options: [
+      "Please leave alone me.",
+      "Please leave me alone.",
+      "Please leave me alonely.",
+      "Please leave me to alone."
+    ],
+    answer: 1,
+    explain: "leave + 목적어(me) + 목적격 보어(alone, 형용사). 어순과 형용사형이 모두 맞아야 한다."
+  },
+  {
+    stem: "동사와 그 뜻 연결이 잘못된 것은?",
+    ctx: null,
+    options: [
+      "make + O + OC : O를 ~로 만들다",
+      "keep + O + OC : O를 ~한 상태로 유지하다",
+      "find + O + OC : O를 발견하다",
+      "call + O + OC : O를 ~라고 부르다"
+    ],
+    answer: 2,
+    explain: "find + O + OC는 ‘O가 ~임을 알다/깨닫다’의 뜻. 단순한 ‘발견하다’가 아님."
+  },
+  {
+    stem: "빈칸에 들어갈 알맞은 말은?",
+    ctx: "I found him ____.",
+    options: ["interest", "interesting", "interestingly", "to interest"],
+    answer: 1,
+    explain: "find + O + OC. 보어 자리에 형용사적 역할의 분사 ‘interesting(흥미로운)’이 적절."
+  },
+  {
+    stem: "밑줄 친 부분의 문장 성분으로 알맞은 것은?",
+    ctx: "The cold weather made my sister <em>sick</em>.",
+    options: ["주어", "목적어", "목적격 보어", "부사"],
+    answer: 2,
+    explain: "make + my sister(목적어) + sick(목적격 보어). sick은 my sister의 상태를 설명."
+  },
+  {
+    stem: "빈칸에 들어갈 알맞은 동사는?",
+    ctx: "What will you ____ your baby? (네 아기를 뭐라고 이름 지을 거니?)",
+    options: ["name", "named", "naming", "to name"],
+    answer: 0,
+    explain: "조동사 will 다음에는 동사원형. 의미상 ‘이름 짓다’이므로 name."
+  },
+  {
+    stem: "어법에 맞는 문장은?",
+    ctx: null,
+    options: [
+      "I got up and found the sky clearly.",
+      "I got up and found the sky clear.",
+      "I got up and found the sky clearness.",
+      "I got up and found clearly the sky."
+    ],
+    answer: 1,
+    explain: "find + O(the sky) + OC(clear). 보어 자리에는 형용사가 온다."
+  },
+  {
+    stem: "다음 문장의 ‘목적어 — 목적격 보어’를 바르게 짝지은 것은?",
+    ctx: "She named her baby Jennifer.",
+    options: [
+      "her — baby",
+      "baby — Jennifer",
+      "her baby — Jennifer",
+      "named — baby"
+    ],
+    answer: 2,
+    explain: "목적어는 ‘her baby(그녀의 아기)’ 전체, 보어는 ‘Jennifer’."
+  },
+  {
+    stem: "빈칸에 들어갈 수 없는 것은?",
+    ctx: "This song makes me ____.",
+    options: ["sad", "happy", "angry", "sadly"],
+    answer: 3,
+    explain: "make의 목적격 보어 자리에는 형용사가 온다. 부사 sadly는 올 수 없다."
+  },
+  {
+    stem: "다음 문장의 의미로 가장 알맞은 것은?",
+    ctx: "Please call me Ted.",
+    options: [
+      "저에게 전화해 주세요, Ted.",
+      "저를 Ted라고 불러 주세요.",
+      "Ted를 저에게 데려와 주세요.",
+      "Ted 대신 전화해 주세요."
+    ],
+    answer: 1,
+    explain: "call + 목적어(me) + 목적격 보어(Ted): ‘O를 ~라고 부르다’."
+  },
+  {
+    stem: "어법상 어색한 부분이 있는 문장은?",
+    ctx: null,
+    options: [
+      "The movie made him a star.",
+      "I found him interesting.",
+      "She kept her room cleanly.",
+      "Please leave me alone."
+    ],
+    answer: 2,
+    explain: "keep + O + OC에서 보어는 형용사여야 함 → cleanly(부사) → clean(형용사)."
+  },
+  {
+    stem: "다음 우리말을 영어로 옮긴 것으로 가장 알맞은 것은?",
+    ctx: "그 추운 날씨가 내 여동생을 아프게 했다.",
+    options: [
+      "The cold weather made sick my sister.",
+      "My sister made the cold weather sick.",
+      "The cold weather made my sister sick.",
+      "Sick made my sister the cold weather."
+    ],
+    answer: 2,
+    explain: "make + 목적어(my sister) + 목적격 보어(sick) 어순이 정확."
+  },
+  {
+    stem: "5형식 문장(주어+동사+목적어+목적격 보어)이 <b>아닌</b> 것은?",
+    ctx: null,
+    options: [
+      "He gave me a book.",
+      "She made me happy.",
+      "I call him Tom.",
+      "They named their dog Max."
+    ],
+    answer: 0,
+    explain: "①은 ‘give + 간접목적어 + 직접목적어’의 4형식. 나머지는 모두 5형식."
+  }
+];
+
+/* ===========================================================
+   Quiz Engine
+   =========================================================== */
+const $ = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+let quizState = null;
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function buildQuiz(){
+  const order = shuffle(QUESTIONS.map((_,i)=>i));
+  const items = order.map((origIdx, displayIdx) => {
+    const q = QUESTIONS[origIdx];
+    const optMap = shuffle(q.options.map((opt,i)=>({opt,i})));
+    const correctNew = optMap.findIndex(o => o.i === q.answer);
+    return {
+      origIdx,
+      displayIdx,
+      stem: q.stem,
+      ctx: q.ctx,
+      options: optMap.map(o=>o.opt),
+      answer: correctNew,
+      explain: q.explain,
+      picked: null
+    };
+  });
+  return { items, submitted:false, score:0 };
+}
+
+const KOR_NUM = ['①','②','③','④'];
+
+function render(){
+  const list = $('#quizList');
+  list.innerHTML = '';
+  quizState.items.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    card.dataset.idx = item.displayIdx;
+
+    const head = `
+      <div class="qhead">
+        <span class="qnum">${item.displayIdx+1}</span>
+        <div class="qstem">${item.stem}</div>
+      </div>`;
+    const ctx = item.ctx ? `<div class="ctx">${item.ctx}</div>` : '';
+    const opts = item.options.map((opt,i)=>`
+      <label class="opt" data-i="${i}">
+        <input type="radio" name="q${item.displayIdx}" value="${i}" />
+        <span><span class="num">${KOR_NUM[i]}</span> ${opt}</span>
+      </label>
+    `).join('');
+
+    card.innerHTML = head + ctx + `<div class="options">${opts}</div>
+      <div class="explain"></div>`;
+    list.appendChild(card);
+  });
+
+  // change handler → progress
+  list.addEventListener('change', e => {
+    if(e.target.name && e.target.name.startsWith('q')){
+      const idx = parseInt(e.target.name.slice(1),10);
+      quizState.items[idx].picked = parseInt(e.target.value,10);
+      updateProgress();
+    }
+  });
+}
+
+function updateProgress(){
+  const answered = quizState.items.filter(i=>i.picked!==null).length;
+  const pct = Math.round(answered / quizState.items.length * 100);
+  $('#progBar').style.width = pct + '%';
+}
+
+function gradeAndShow(){
+  let score = 0;
+  quizState.items.forEach(item => {
+    const card = document.querySelector(`.qcard[data-idx="${item.displayIdx}"]`);
+    const opts = card.querySelectorAll('.opt');
+    opts.forEach((el,i) => {
+      el.classList.add('locked');
+      el.querySelector('input').disabled = true;
+      if(i === item.answer) el.classList.add('correct');
+      if(item.picked === i && item.picked !== item.answer) el.classList.add('wrong');
+    });
+    const isRight = item.picked === item.answer;
+    if(isRight) score++;
+    const headEl = card.querySelector('.qhead');
+    const tag = document.createElement('span');
+    tag.className = 'review-tag ' + (isRight ? 'ok' : 'no');
+    tag.textContent = isRight ? '정답 ✓' : '오답 ✗';
+    headEl.appendChild(tag);
+    const exp = card.querySelector('.explain');
+    exp.innerHTML = '<b>해설.</b> ' + item.explain;
+    exp.classList.add('show');
+  });
+  quizState.submitted = true;
+  quizState.score = score;
+  showResult();
+}
+
+function gradeBadge(score){
+  const pct = score / quizState.items.length * 100;
+  if(pct >= 90) return {label:'A · 매우 우수', color:'#2faa56'};
+  if(pct >= 75) return {label:'B · 잘 했어요', color:'#4aa3df'};
+  if(pct >= 60) return {label:'C · 조금 더!', color:'#e6a93b'};
+  return {label:'D · 다시 학습하기', color:'#e0524d'};
+}
+
+function showResult(){
+  const name = (quizState.studentName || '학생').trim() || '학생';
+  $('#resultArea').classList.remove('hidden');
+  $('#scoreText').innerHTML = `${quizState.score} <small>/ ${quizState.items.length}</small>`;
+  const g = gradeBadge(quizState.score);
+  const badge = $('#gradeBadge');
+  badge.textContent = g.label;
+  badge.style.background = g.color;
+  $('#resultTitle').textContent = `${name} 학생, 채점 결과`;
+  const wrong = quizState.items.length - quizState.score;
+  const date = new Date();
+  const stamp = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
+  $('#resultMeta').innerHTML = `정답 ${quizState.score} · 오답 ${wrong}<br>제출 시각: ${stamp}`;
+  // scroll to result
+  $('#resultArea').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function startQuiz(){
+  const name = $('#studentName').value.trim();
+  quizState = buildQuiz();
+  quizState.studentName = name;
+  $('#startCard').classList.add('hidden');
+  $('#quizArea').classList.remove('hidden');
+  $('#resultArea').classList.add('hidden');
+  render();
+  updateProgress();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function submitQuiz(){
+  const unanswered = quizState.items.filter(i=>i.picked===null).length;
+  if(unanswered > 0){
+    if(!confirm(`아직 ${unanswered}문제가 풀리지 않았어요. 그래도 제출하시겠어요?`)) return;
+  }
+  gradeAndShow();
+}
+
+function resetQuiz(){
+  $('#studentName').value = quizState && quizState.studentName ? quizState.studentName : '';
+  $('#startCard').classList.remove('hidden');
+  $('#quizArea').classList.add('hidden');
+  $('#resultArea').classList.add('hidden');
+  $('#progBar').style.width = '0%';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+$('#btnStart').addEventListener('click', startQuiz);
+$('#btnSubmit').addEventListener('click', submitQuiz);
+$('#btnReset').addEventListener('click', () => {
+  if(confirm('지금까지 푼 답이 모두 사라집니다. 새 문제로 다시 시작할까요?')) startQuiz();
+});
+$('#btnRetake').addEventListener('click', startQuiz);
+$('#btnReview').addEventListener('click', () => {
+  document.querySelector('.qcard').scrollIntoView({behavior:'smooth',block:'start'});
+});
+$('#studentName').addEventListener('keydown', e => { if(e.key==='Enter') startQuiz(); });
+</script>
+</body>
+</html>
